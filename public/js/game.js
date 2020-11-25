@@ -36,13 +36,13 @@ function preload() {
   //Carga de vehiculos
   this.load.image('carro', 'assets/cars/trineo.png');
   this.load.image('policia', 'assets/cars/Police.png');
-  this.load.image('startBoton','assets/mapa/start.png');
+ // this.load.image('startBoton','assets/mapa/start.png');
 
   //Carga del mapa
 
   this.load.image('fondo', 'assets/mapa/fondoHielo.png');
-  this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa.json')
-  this.load.image('tiles', 'assets/mapa/terrain_atlas.png')
+ // this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa.json')
+  //this.load.image('tiles', 'assets/mapa/terrain_atlas.png')
   this.load.image('fn', 'assets/mapa/fondoHielo.png')
 
 }
@@ -54,14 +54,14 @@ function create() {
 
   this.add.image(655, 341, 'fondo');
   mapa = this.make.tilemap({ key: 'mapa' })
-  var tilesets = mapa.addTilesetImage('terrain_atlas', 'tiles');
-  var solidos = mapa.createDynamicLayer('solidos', tilesets, 0, 0);
-  var botonHenry = this.add.sprite(655, 341, "startBoton").setInteractive();
+ // var tilesets = mapa.addTilesetImage('terrain_atlas', 'tiles');
+ // var solidos = mapa.createDynamicLayer('solidos', tilesets, 0, 0);
+  //var botonHenry = this.add.sprite(655, 341, "startBoton").setInteractive();
 
-  botonHenry.on('pointerup', function (pointer) {
-    this.setTint(0x00ff1a);
-    this.empezar = true;
-  });
+  //botonHenry.on('pointerup', function (pointer) {
+  //  this.setTint(0x00ff1a);
+  //  this.empezar = true;
+  //});
 
   //Declaracion de socket y otros jugadores
   var self = this;
@@ -99,7 +99,6 @@ function create() {
 
     if (valor >= 2 ) {
       this.ready = true;
-
       this.socket.emit('listos');
   }
   });
@@ -155,24 +154,21 @@ function create() {
   });
 
 
+//self.physics.add.collider(self.carro, self.otherPlayers, function(){
 
-  //Colisiones entre policias
-  this.socket.on('collisionBetweenPlayers', function (playerInfo) {
 
-    
-        self.physics.add.collider(self.carro, self.otherPlayers, function(){
-          
-          //aqui puedes poner lo que quieres que hagan los carros cuando choques, el self.carro es el jugador local 
-         // por ejemplo yo lo puse chiquitin self.carro.setDisplaySize(5,5);
-         
-         
-        });
-  
 
-  });
-
+ //Colisiones entre policias
+ 
+  self.physics.add.overlap(self.carro, self.otherPlayers, destruyete, null, this);
 }
 
+function destruyete(carro, jugadorChocado){
+  console.log('Entre');
+  this.socket.emit('collisionBetweenPlayers');
+ // console.log('Id de carro: ', carro.playerId);
+  //console.log('Id de jugador chocado: ', jugadorChocado.playerId);
+}
 
 //Creacion de vehiculo y jugador
 function addPlayer(self, playerInfo, tipoCarro, sizeX, sizeY) {
@@ -244,7 +240,9 @@ function update() {
 
 
   }
-  } 
+  }else{
+    alert('Se necesitan 2 jugadores para iniciar')
+  }
   
 
 
