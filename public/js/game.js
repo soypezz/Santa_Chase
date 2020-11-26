@@ -198,8 +198,7 @@ function addOtherPlayers(self, playerInfo) {
     identidadOtro = true;
   } else {
     otherPlayer = self.add
-
-      .sprite(playerInfo.x, playerInfo.y, "policia")
+    .sprite(playerInfo.x, playerInfo.y, "policia")
       .setOrigin(0.5, 0.5)
       .setDisplaySize(35, 48);
     identidadOtro = false;
@@ -240,7 +239,7 @@ function update() {
           r !== this.carro.oldPosition.rotation)
       ) {
         
-        console.log(contadorPolicias);
+        
         this.socket.emit("playerMovement", {
           x: this.carro.x,
           y: this.carro.y,
