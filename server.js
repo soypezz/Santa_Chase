@@ -25,7 +25,7 @@ io.on('connection', function (socket) {
   conectados++;
   socket.emit('conectados', conectados);
   socket.on('listos', () => {
-  socket.broadcast.emit('bro');
+    socket.broadcast.emit('bro');
   });
 
 
@@ -33,7 +33,7 @@ io.on('connection', function (socket) {
   if (i === 0) {
     i++;
     ladron = true;
-   
+
   } else {
     ladron = false;
     coorX = coorX + 80;
@@ -47,13 +47,13 @@ io.on('connection', function (socket) {
     y: coorY,
     isLadron: ladron,
     playerId: socket.id,
-    
-    
-    
+
+
+
   };
   // Actualiza los jugadores 
   socket.emit('currentPlayers', players);
-  
+
 
   /*Manda el ganador a todos los jugadores.
   socket.on('ganador', data => {
@@ -65,7 +65,7 @@ io.on('connection', function (socket) {
 
 
 
-  
+
   // actualiza a todos los jugadores sobre el nuevo jugador
   socket.broadcast.emit('newPlayer', players[socket.id]);
 
@@ -76,13 +76,13 @@ io.on('connection', function (socket) {
     delete players[socket.id];
     //manda un mensaje de jugador desconectado
     io.emit('disconnect', socket.id);
-  /*  io.emit('¿SoyLadron?', players[socket.id]);
-    socket.on('Si', confirmacion) ;
-    console.log('confirmacion estado:');
-    if(confirmacion){
-      i = 0;
-    }*/
-    if(desconectados === conectados){
+    /*  io.emit('¿SoyLadron?', players[socket.id]);
+      socket.on('Si', confirmacion) ;
+      console.log('confirmacion estado:');
+      if(confirmacion){
+        i = 0;
+      }*/
+    if (desconectados === conectados) {
       i = 0;
     }
   });
@@ -92,12 +92,16 @@ io.on('connection', function (socket) {
     players[socket.id].x = movementData.x;
     players[socket.id].y = movementData.y;
     players[socket.id].rotation = movementData.rotation;
-    
+
     // emite el movimiento del jugador a todos los jugadores
-   
-    socket.on('collisionBetweenPlayers');
+    socket.on('collisionBetweenPlayers', () => {
+      players[socket.id].x = movementData.x;
+      players[socket.id].y = movementData.y;
+      players[socket.id].rotation = movementData.rotation;
+
+    });
     socket.broadcast.emit('playerMoved', players[socket.id]);
-    
+
   });
 
 

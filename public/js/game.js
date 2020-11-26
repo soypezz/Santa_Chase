@@ -13,7 +13,7 @@ var config = {
     }
   },
   scene: {
-    
+
     preload: preload,
     create: create,
     update: update
@@ -31,18 +31,18 @@ var empezar = false;
 function preload() {
 
 
- 
+
 
   //Carga de vehiculos
   this.load.image('carro', 'assets/cars/trineo.png');
   this.load.image('policia', 'assets/cars/Police.png');
- // this.load.image('startBoton','assets/mapa/start.png');
+  // this.load.image('startBoton','assets/mapa/start.png');
 
   //Carga del mapa
 
   this.load.image('fondo', 'assets/mapa/fondoHielo.png');
- // this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa.json')
-  //this.load.image('tiles', 'assets/mapa/terrain_atlas.png')
+  this.load.tilemapTiledJSON('mapa', 'assets/mapa/mapa.json')
+  this.load.image('tiles', 'assets/mapa/terrain_atlas.png')
   this.load.image('fn', 'assets/mapa/fondoHielo.png')
 
 }
@@ -54,8 +54,12 @@ function create() {
 
   this.add.image(655, 341, 'fondo');
   mapa = this.make.tilemap({ key: 'mapa' })
- // var tilesets = mapa.addTilesetImage('terrain_atlas', 'tiles');
- // var solidos = mapa.createDynamicLayer('solidos', tilesets, 0, 0);
+  var tilesets = mapa.addTilesetImage('terrain_atlas', 'tiles');
+  var solidos = mapa.createDynamicLayer('solidos', tilesets, 0, 0);
+  solidos.setCollisionByProperty({ solido: true });
+
+
+
   //var botonHenry = this.add.sprite(655, 341, "startBoton").setInteractive();
 
   //botonHenry.on('pointerup', function (pointer) {
@@ -70,6 +74,7 @@ function create() {
   var sizeX;
   var sizeY;
   
+
 
   //Actualizar objeto Jugadores
   this.socket.on('currentPlayers', function (players) {
@@ -86,6 +91,8 @@ function create() {
 
         }
 
+        
+
       } else {
         addOtherPlayers(self, players[id]);
       }
@@ -94,13 +101,12 @@ function create() {
 
 
 
-
   this.socket.on('conectados', valor => {
 
-    if (valor >= 2 ) {
+    if (valor >= 2) {
       this.ready = true;
       this.socket.emit('listos');
-  }
+    }
   });
 
   this.socket.on('bro', () => {
@@ -154,20 +160,29 @@ function create() {
   });
 
 
-//self.physics.add.collider(self.carro, self.otherPlayers, function(){
-
-
-
- //Colisiones entre policias
- 
+  //Colisiones entre policia7s
+  
   self.physics.add.overlap(self.carro, self.otherPlayers, destruyete, null, this);
+  self.physics.add.collider(self.carro, self.solidos);
+  
 }
 
-function destruyete(carro, jugadorChocado){
-  console.log('Entre');
+function destruyete(carro, jugadorChocado) {
+  
   this.socket.emit('collisionBetweenPlayers');
- // console.log('Id de carro: ', carro.playerId);
-  //console.log('Id de jugador chocado: ', jugadorChocado.playerId);
+  console.log('Id de carro: ', carro.playerId);
+  console.log('Id de jugador chocado: ', jugadorChocado.playerId);
+
+  /*if(carro.isLadron || jugadorChocado.isLadron){
+    //se termina el juego
+    this.ready = false;
+  }else{
+    if(!carro.isLadron && !jugadorChocado.isLadron){
+      carro.destroy();
+      
+      //mandarle al socket que esos jugadores policias se choaron y que carro debe dejar de moverse
+    }
+  }*/
 }
 
 //Creacion de vehiculo y jugador
@@ -181,6 +196,7 @@ function addPlayer(self, playerInfo, tipoCarro, sizeX, sizeY) {
   self.carro.setMaxVelocity(200);
   self.carro.setCollideWorldBounds(true);
   self.physics.add.collider(self.carro, self.otherPlayers);
+ 
 
 }
 
@@ -208,7 +224,7 @@ function update() {
 
 
   if (this.ready) {
-    
+
     //Movimiento del carro
     if (this.carro) {
       if (this.cursors.left.isDown) {
@@ -224,6 +240,7 @@ function update() {
         this.carro.setAcceleration(0);
       }
       // emite el movimiento del jugador
+      
       var x = this.carro.x;
       var y = this.carro.y;
       var r = this.carro.rotation;
@@ -236,14 +253,14 @@ function update() {
         y: this.carro.y,
         rotation: this.carro.rotation
       };
-    
 
 
-  }
-  }else{
+
+    }
+  } else {
     alert('Se necesitan 2 jugadores para iniciar')
   }
-  
+
 
 
 
