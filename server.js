@@ -1,7 +1,7 @@
-var express = require('express');
+var express = require("express");
 var app = express();
-var server = require('http').Server(app);
-var io = require('socket.io').listen(server);
+var server = require("http").Server(app);
+var io = require("socket.io").listen(server);
 var conectados = 0;
 var i = 0;
 var ladron;
@@ -12,32 +12,30 @@ var desconectados = 0;
 //Objeto jugadores
 var players = {};
 
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + "/public"));
 
-app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/index.html');
+app.get("/", function (req, res) {
+  res.sendFile(__dirname + "/index.html");
 });
 
-io.on('connection', function (socket) {
+io.on("connection", function (socket) {
   conectados++;
-  socket.emit('conectados', conectados);
-  socket.on('listos', () => {
-    socket.broadcast.emit('bro');
+  socket.emit("conectados", conectados);
+  socket.on("listos", () => {
+    socket.broadcast.emit("bro");
   });
 
-  console.log('a user connected: ', socket.id);
+  console.log("a user connected: ", socket.id);
   if (i === 0) {
     i++;
     ladron = true;
-
   } else {
     ladron = false;
     coorX = coorX + 120;
-    
 
-    if(coorX > 1200){
-       coorX = 150;
-       coorY = coorY + 150;
+    if (coorX > 1200) {
+      coorX = 150;
+      coorY = coorY + 150;
     }
   }
 
@@ -49,8 +47,8 @@ io.on('connection', function (socket) {
     isLadron: ladron,
     playerId: socket.id,
   };
-  // Actualiza los jugadores 
-  socket.emit('currentPlayers', players);
+  // Actualiza los jugadores
+  socket.emit("currentPlayers", players);
 
   /*Manda el ganador a todos los jugadores.
   socket.on('ganador', data => {
@@ -61,16 +59,16 @@ io.on('connection', function (socket) {
   });*/
 
   // actualiza a todos los jugadores sobre el nuevo jugador
-  socket.broadcast.emit('newPlayer', players[socket.id]);
+  socket.broadcast.emit("newPlayer", players[socket.id]);
 
   // Cuando se desconecta un jugador se remueve del objeto jugadores
-  socket.on('disconnect', function () {
+  socket.on("disconnect", function () {
     desconectados++;
-    console.log('user disconnected: ', socket.id);
+    console.log("user disconnected: ", socket.id);
     delete players[socket.id];
     //manda un mensaje de jugador desconectado
-    io.emit('disconnect', socket.id);
-    
+    io.emit("disconnect", socket.id);
+
     /*  io.emit('¿SoyLadron?', players[socket.id]);
       socket.on('Si', confirmacion) ;
       console.log('confirmacion estado:');
@@ -83,21 +81,19 @@ io.on('connection', function (socket) {
   });
 
   // cuando se mueve un jugador se acualiza su informacion de posicion.
-  socket.on('playerMovement', function (movementData) {
+  socket.on("playerMovement", function (movementData) {
     players[socket.id].x = movementData.x;
     players[socket.id].y = movementData.y;
     players[socket.id].rotation = movementData.rotation;
-
+    players[socket.id].SizeX = movementData.SizeX;
+    players[socket.id].SizeY = movementData.SizeY;
     // emite el movimiento del jugador a todos los jugadores
-    socket.emit('collisionBetweenPlayers');
-      
-    socket.broadcast.emit('playerMoved', players[socket.id]);
+    socket.emit("collisionBetweenPlayers");
 
+    socket.broadcast.emit("playerMoved", players[socket.id]);
   });
-
 });
 
 server.listen(8081, function () {
   console.log(`Listening on ${server.address().port}`);
 });
-
