@@ -31,12 +31,8 @@ io.on("connection", function (socket) {
     ladron = true;
   } else {
     ladron = false;
-    coorX = coorX + 120;
-
-    if (coorX > 1200) {
-      coorX = 150;
-      coorY = coorY + 150;
-    }
+    coorX = Math.floor(Math.random() * 1300);
+    coorY = Math.floor(Math.random() * 680);
   }
 
   //Crea un nuevo jugador y lo añade al objeto de jugadores
