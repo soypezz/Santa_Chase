@@ -6,14 +6,11 @@ var conectados = 0;
 var i = 0;
 var ladron;
 var coorX = 150;
-var coorY = 90 + Math.floor(Math.random() * 40);
+var coorY = 150;
 var desconectados = 0;
-var confirmacion;
 
 //Objeto jugadores
 var players = {};
-
-
 
 app.use(express.static(__dirname + '/public'));
 
@@ -28,7 +25,6 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('bro');
   });
 
-
   console.log('a user connected: ', socket.id);
   if (i === 0) {
     i++;
@@ -36,8 +32,13 @@ io.on('connection', function (socket) {
 
   } else {
     ladron = false;
-    coorX = coorX + 80;
-    coorY = coorY;
+    coorX = coorX + 120;
+    
+
+    if(coorX > 1200){
+       coorX = 150;
+       coorY = coorY + 150;
+    }
   }
 
   //Crea un nuevo jugador y lo añade al objeto de jugadores
@@ -47,13 +48,9 @@ io.on('connection', function (socket) {
     y: coorY,
     isLadron: ladron,
     playerId: socket.id,
-
-
-
   };
   // Actualiza los jugadores 
   socket.emit('currentPlayers', players);
-
 
   /*Manda el ganador a todos los jugadores.
   socket.on('ganador', data => {
@@ -62,9 +59,6 @@ io.on('connection', function (socket) {
     socket.emit('soy ganador', data)
     socket.emit('otroGana')
   });*/
-
-
-
 
   // actualiza a todos los jugadores sobre el nuevo jugador
   socket.broadcast.emit('newPlayer', players[socket.id]);
@@ -76,6 +70,7 @@ io.on('connection', function (socket) {
     delete players[socket.id];
     //manda un mensaje de jugador desconectado
     io.emit('disconnect', socket.id);
+    
     /*  io.emit('¿SoyLadron?', players[socket.id]);
       socket.on('Si', confirmacion) ;
       console.log('confirmacion estado:');
@@ -94,22 +89,10 @@ io.on('connection', function (socket) {
     players[socket.id].rotation = movementData.rotation;
 
     // emite el movimiento del jugador a todos los jugadores
-    socket.on('collisionBetweenPlayers', () => {
-      players[socket.id].x = movementData.x;
-      players[socket.id].y = movementData.y;
-      players[socket.id].rotation = movementData.rotation;
-
-    });
+    socket.emit('collisionBetweenPlayers');
+      
     socket.broadcast.emit('playerMoved', players[socket.id]);
 
-  });
-
-
-
-  //reinicia el maximo de vueltas
-  socket.on('nuevoMax', function () {
-    scores.max = 0;
-    io.emit('redo', players);
   });
 
 });
