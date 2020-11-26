@@ -29,14 +29,12 @@ io.on("connection", function (socket) {
   if (i === 0) {
     i++;
     ladron = true;
+    
   } else {
     ladron = false;
-    coorX = coorX + 120;
-
-    if (coorX > 1200) {
-      coorX = 150;
-      coorY = coorY + 150;
-    }
+    coorX = Math.floor(Math.random() * 1300);
+    coorY = Math.floor(Math.random() * 680);
+    
   }
 
   //Crea un nuevo jugador y lo añade al objeto de jugadores
@@ -46,6 +44,7 @@ io.on("connection", function (socket) {
     y: coorY,
     isLadron: ladron,
     playerId: socket.id,
+   
   };
   // Actualiza los jugadores
   socket.emit("currentPlayers", players);
@@ -85,12 +84,15 @@ io.on("connection", function (socket) {
     players[socket.id].x = movementData.x;
     players[socket.id].y = movementData.y;
     players[socket.id].rotation = movementData.rotation;
-    players[socket.id].SizeX = movementData.SizeX;
-    players[socket.id].SizeY = movementData.SizeY;
+   
+
+    players[socket.id].setDisplaySize(movementData.SizeX, movementData.SizeY);
+    
     // emite el movimiento del jugador a todos los jugadores
     socket.emit("collisionBetweenPlayers");
-
     socket.broadcast.emit("playerMoved", players[socket.id]);
+
+    
   });
 });
 
