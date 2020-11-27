@@ -6,6 +6,7 @@
  */
 const studentName = 'Marcela Hernandez';
 
+
 /**
  * Student Name
  * @type {array}
@@ -124,7 +125,7 @@ const newPlayer = (playerId) => {
  * Recibe un jugador desconectado y lo destruye
  * @param {number} playerId - id del jugador que ya entrado
  */
-const disconnect = (playerId) => {
+const emmitDisconnect = (playerId) => {
 
 }
 
@@ -135,4 +136,29 @@ const disconnect = (playerId) => {
 const playerMoved = (playerId) => {
 
 }
+
+/**
+ * Recibe una conexion dada por el socket y la emite al cliente. Ademas verifica si el juego ya puede empezar.
+ * @param {socket} socket - conexion de entrada
+ */
+ const connection = (socket) => {
+
+ }
+
+ /**
+ * Recibe una desconexion dada por el socket y la emite al cliente. Ademas verifica si ya no quedan mas jugadores.
+ */
+const onDisconnect = {
+
+}
+
+/**
+ * Recibe un jugador que se ha movido y actualiza sus posiciones al resto de juagdores
+*@param {movementData} movementData - jugador que se ha movido
+*/
+const playerMovement = (movementData) => {
+
+}
+
+
 

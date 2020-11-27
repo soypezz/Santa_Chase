@@ -49,14 +49,6 @@ io.on("connection", function (socket) {
 alert('Los policias han ganado, finaliza el juego.')
   });
 
-  /*Manda el ganador a todos los jugadores.
-  socket.on('ganador', data => {
-    console.log('hola chicos')
-    socket.broadcast.emit('soy ganador', data)
-    socket.emit('soy ganador', data)
-    socket.emit('otroGana')
-  });*/
-
   // actualiza a todos los jugadores sobre el nuevo jugador
   socket.broadcast.emit("newPlayer", players[socket.id]);
 
@@ -67,13 +59,6 @@ alert('Los policias han ganado, finaliza el juego.')
     delete players[socket.id];
     //manda un mensaje de jugador desconectado
     io.emit("disconnect", socket.id);
-
-    /*  io.emit('¿SoyLadron?', players[socket.id]);
-      socket.on('Si', confirmacion) ;
-      console.log('confirmacion estado:');
-      if(confirmacion){
-        i = 0;
-      }*/
     if (desconectados === conectados) {
       i = 0;
     }
