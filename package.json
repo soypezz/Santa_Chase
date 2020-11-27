@@ -1,9 +1,9 @@
 {
   "name": "phaser_tut2",
   "version": "1.0.0",
-  "description": "",
   "main": "server.js",
   "scripts": {
+    "doc": "jsdoc -c jsdoc.json",
     "start": "node server.js"
   },
   "author": "Scott Westover",
@@ -11,5 +11,18 @@
   "dependencies": {
     "express": "^4.16.3",
     "socket.io": "^2.1.0"
-  }
+  },
+  "devDependencies": {
+    "jsdoc": "^3.6.6"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/soypezz/Santa_Chase.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/soypezz/Santa_Chase/issues"
+  },
+  "homepage": "https://github.com/soypezz/Santa_Chase#readme",
+  "description": ""
 }

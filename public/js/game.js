@@ -27,15 +27,13 @@ var empezar = false;
 var finalizado = false;
 var identidad;
 var identidadOtro;
-var contadorPolicias = 0;
-
-
 
 function preload() {
   //Carga de vehiculos
   this.load.image("carro", "assets/cars/trineo.png");
   this.load.image("policia", "assets/cars/Police.png");
   this.load.image("placa", "assets/cars/policePlaca.png" );
+  // this.load.image('startBoton','assets/mapa/start.png');
 
   //Carga del mapa
   this.load.image("fondo", "assets/mapa/fondoHielo.png");
@@ -47,12 +45,11 @@ function preload() {
 
 function create() {
   //Creacion del mapa
-  var self = this;
   this.add.image(655, 341, "fondo");
   mapa = this.make.tilemap({ key: "mapa" });
 
   //Declaracion de socket y otros jugadores
-  
+  var self = this;
   this.socket = io();
   this.otherPlayers = this.physics.add.group();
   var sizeX;
@@ -63,15 +60,14 @@ function create() {
     Object.keys(players).forEach(function (id) {
       if (players[id].playerId === self.socket.id) {
         if (players[id].isLadron) {
-          sizeX = 30;
-          sizeY = 45;
+          sizeX = 35;
+          sizeY = 50;
           identidad = true;
           addPlayer(self, players[id], "carro", sizeX, sizeY);
         } else {
           sizeX = 35;
           sizeY = 48;
           identidad = false;
-          contadorPolicias = contadorPolicias + 1;
           addPlayer(self, players[id], "policia", sizeX, sizeY);
         }
       } else {
@@ -80,14 +76,14 @@ function create() {
     });
   });
 
-  this.socket.on("collisionBetweenPlayers", () => {
-    
-    collisionPlayers(self);
 
+//Verificacion de collision
+  this.socket.on("collisionBetweenPlayers", () => {
+    collisionPlayers(self);
   });
 
   this.socket.on("conectados", (valor) => {
-    if (valor >= 2) {
+    if (valor >= 3) {
       this.ready = true;
       this.socket.emit("listos");
     }
@@ -102,12 +98,13 @@ function create() {
     addOtherPlayers(self, playerInfo);
   });
 
+
+
   //Jugador desconectado
   this.socket.on("disconnect", function (playerId) {
     self.otherPlayers.getChildren().forEach(function (otherPlayer) {
       if (playerId === otherPlayer.playerId) {
         otherPlayer.destroy();
-
       }
     });
   });
@@ -116,24 +113,24 @@ function create() {
   this.socket.on("playerMoved", function (playerInfo) {
     self.otherPlayers.getChildren().forEach(function (otherPlayer) {
       if (playerInfo.playerId === otherPlayer.playerId) {
-
+      //  console.log("MOVEMENT DATA IN PLAYER MOVED", playerInfo);
         otherPlayer.setRotation(playerInfo.rotation);
         otherPlayer.setPosition(playerInfo.x, playerInfo.y);
         otherPlayer.setDisplaySize(playerInfo.SizeX, playerInfo.SizeY);
         
-        
-
       }
     });
-
-    // collisionPlayers(self);
   });
+
   this.cursors = this.input.keyboard.createCursorKeys();
+
   //Colisiones entre jugador y mapa
   this.socket.on("checkpoint_location", function (checkpoint_location) {
     if (self.checkpoint) self.checkpoint.destroy();
     self.checkpoint = self.physics;
   });
+
+  //Colisiones entre policias
 }
 
 
@@ -142,30 +139,28 @@ function collisionPlayers(self) {
   self.physics.add.overlap(self.carro, self.otherPlayers, function (carro, jugadorChocado) {
    jugadorChocado.setDisplaySize(0,0);
    carro.setDisplaySize(0,0);
-    
+
     self.add.image(jugadorChocado.x, jugadorChocado.y, "explotion");
     self.add.image(carro.x, carro.y, "explotion");
 
     if (identidad) {
       console.log('choque como el ladron');
       finalizado = true;
-      //alert('Ganaron los policias')
     } else {
-      contadorPolicias = contadorPolicias - 1;
       console.log('choque como un policia');
     }
 
     if (identidadOtro) {
-      console.log('choco el ladron');
       finalizado = true;
-      //alert('Ganaron los policias')
+      console.log('choco el ladron');
+      
     } else {
-      contadorPolicias = contadorPolicias - 1;
       console.log('choco un policia');
     }
 
     if(finalizado){
       self.add.image(655, 341, "placa");
+     // this.socket.on("ganadores");
     }
   }
   );
@@ -183,8 +178,6 @@ function addPlayer(self, playerInfo, tipoCarro, sizeX, sizeY) {
   self.carro.setAngularDrag(250);
   self.carro.setMaxVelocity(200);
   self.carro.setCollideWorldBounds(true);
-
-  
 }
 
 //Creacion de los autos de los demas jugadores en el servidor
@@ -194,15 +187,14 @@ function addOtherPlayers(self, playerInfo) {
     otherPlayer = self.add
       .sprite(playerInfo.x, playerInfo.y, "carro")
       .setOrigin(0.5, 0.5)
-      .setDisplaySize(30, 45);
-    identidadOtro = true;
+      .setDisplaySize(35, 50);
+      identidadOtro = true;
   } else {
     otherPlayer = self.add
-    .sprite(playerInfo.x, playerInfo.y, "policia")
+      .sprite(playerInfo.x, playerInfo.y, "policia")
       .setOrigin(0.5, 0.5)
       .setDisplaySize(35, 48);
-    identidadOtro = false;
-    contadorPolicias = contadorPolicias + 1;
+      identidadOtro = false;
   }
   otherPlayer.playerId = playerInfo.playerId;
   self.otherPlayers.add(otherPlayer);
@@ -238,15 +230,13 @@ function update() {
           y !== this.carro.oldPosition.y ||
           r !== this.carro.oldPosition.rotation)
       ) {
-        
-        
+       
         this.socket.emit("playerMovement", {
           x: this.carro.x,
           y: this.carro.y,
           rotation: this.carro.rotation,
           SizeX: this.carro.displayWidth,
           SizeY: this.carro.displayHeight,
-
         });
       }
       // guarda la ultima posicion del jugador
@@ -257,6 +247,6 @@ function update() {
       };
     }
   } else {
-    alert("Se necesitan 2 jugadores para iniciar");
+    alert("Para jugar deben entrar 3 jugadores");
   }
 }
