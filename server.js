@@ -45,6 +45,9 @@ io.on("connection", function (socket) {
   };
   // Actualiza los jugadores
   socket.emit("currentPlayers", players);
+  socket.emit("ganadores", () => {
+alert('Los policias han ganado, finaliza el juego.')
+  });
 
   /*Manda el ganador a todos los jugadores.
   socket.on('ganador', data => {

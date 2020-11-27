@@ -47,11 +47,6 @@ function create() {
   //Creacion del mapa
   this.add.image(655, 341, "fondo");
   mapa = this.make.tilemap({ key: "mapa" });
-  //var tilesets = mapa.addTilesetImage("terrain_atlas", "tiles");
-  //var solidos = mapa.createDynamicLayer("solidos", tilesets, 0, 0);
-  //solidos.setCollisionByProperty({ solido: true });
-
- 
 
   //Declaracion de socket y otros jugadores
   var self = this;
@@ -65,8 +60,8 @@ function create() {
     Object.keys(players).forEach(function (id) {
       if (players[id].playerId === self.socket.id) {
         if (players[id].isLadron) {
-          sizeX = 30;
-          sizeY = 45;
+          sizeX = 35;
+          sizeY = 50;
           identidad = true;
           addPlayer(self, players[id], "carro", sizeX, sizeY);
         } else {
@@ -81,12 +76,14 @@ function create() {
     });
   });
 
+
+//Verificacion de collision
   this.socket.on("collisionBetweenPlayers", () => {
     collisionPlayers(self);
   });
 
   this.socket.on("conectados", (valor) => {
-    if (valor >= 2) {
+    if (valor >= 3) {
       this.ready = true;
       this.socket.emit("listos");
     }
@@ -101,12 +98,7 @@ function create() {
     addOtherPlayers(self, playerInfo);
   });
 
-  //Pregunta si el Jugador desconectado es el Ladron
-  this.socket.on("¿SoyLadron?", function (playerInfo) {
-    if (playerInfo.isLadron) {
-      this.socket.emit("Si", true);
-    }
-  });
+
 
   //Jugador desconectado
   this.socket.on("disconnect", function (playerId) {
@@ -125,8 +117,7 @@ function create() {
         otherPlayer.setRotation(playerInfo.rotation);
         otherPlayer.setPosition(playerInfo.x, playerInfo.y);
         otherPlayer.setDisplaySize(playerInfo.SizeX, playerInfo.SizeY);
-       // console.log("el wid: ", playerInfo.SizeX);
-       // console.log("el jai: ", playerInfo.SizeY);
+        
       }
     });
   });
@@ -142,12 +133,6 @@ function create() {
   //Colisiones entre policias
 }
 
-function destruyete(carro, jugadorChocado) {
-  jugadorChocado.setDisplaySize(1, 1);
-  carro.setDisplaySize(1, 1);
-
-  //console.log('jugadorChocadoID: ', jugadorChocado.playerId);
-}
 
 //Colision de jugadores
 function collisionPlayers(self) {
@@ -174,6 +159,7 @@ function collisionPlayers(self) {
 
     if(finalizado){
       self.add.image(655, 341, "placa");
+     // this.socket.on("ganadores");
     }
   }
   );
@@ -200,7 +186,7 @@ function addOtherPlayers(self, playerInfo) {
     otherPlayer = self.add
       .sprite(playerInfo.x, playerInfo.y, "carro")
       .setOrigin(0.5, 0.5)
-      .setDisplaySize(30, 45);
+      .setDisplaySize(35, 50);
       identidadOtro = true;
   } else {
     otherPlayer = self.add
@@ -260,6 +246,6 @@ function update() {
       };
     }
   } else {
-    alert("Se necesitan 2 jugadores para iniciar");
+    alert("Para jugar deben entrar 3 jugadores");
   }
 }
